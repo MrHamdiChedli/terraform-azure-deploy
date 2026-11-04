@@ -1,2 +1,10 @@
-# Accepted findings of `trivy config`, each with the reason. Empty until a scan says otherwise.
-misconfigurations: []
+# Accepted findings of `trivy config`, each with the reason.
+misconfigurations:
+  - id: AZU-0012
+    paths:
+      - bootstrap/main.tf
+    statement: >-
+      The state storage account allows all networks. Access still requires an Entra ID role
+      (shared keys are disabled) and TLS 1.2. A network allow-list would lock out a workstation
+      with a dynamic home IP. With a fixed egress (office, VPN, CI runner), set network_rules
+      to default Deny with that address.

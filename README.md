@@ -57,6 +57,8 @@ The environment is destroyed after each test to save the student credit, and `te
 | **Health** | Readiness on `/healthz` (checks the database), liveness on TCP only, so a database outage doesn't restart the app |
 | **Database access** | Public endpoint with TLS enforced and a firewall that only admits Azure services. See the trade-off below |
 
+**Accepted scan finding:** Trivy flags the state storage account as reachable from any network (AZU-0012, critical). Access still requires an Entra ID role, since shared keys are disabled, and TLS. A network allow-list would lock out a workstation whose home IP changes. The exception and its reason are recorded in [.trivyignore.yaml](.trivyignore.yaml); with a fixed egress address (office, VPN) the fix is `network_rules { default_action = "Deny" }` plus that address.
+
 **Trade-off I chose consciously:** in production I would put the database on a private network (VNet integration and a private endpoint). On Container Apps' consumption plan, the outbound address isn't fixed, so the firewall allows "Azure services" in general. That's acceptable for a demo with no real data, not for a real customer database.
 
 ## CI
