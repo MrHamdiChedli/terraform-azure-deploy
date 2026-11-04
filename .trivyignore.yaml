@@ -1,0 +1,2 @@
+# Accepted findings of `trivy config`, each with the reason. Empty until a scan says otherwise.
+misconfigurations: []

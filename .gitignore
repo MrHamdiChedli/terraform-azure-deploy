@@ -1,0 +1,10 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# Local settings: contain the backend location and your email
+terraform.tfvars
+backend.hcl

@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  # Pinned by digest: in March 2026 attackers rewrote almost every trivy-action tag.
+  TRIVY: aquasec/trivy:0.76.1@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: [bootstrap, infra]
+    defaults:
+      run:
+        working-directory: ${{ matrix.dir }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.16.6
+      - name: Formatting
+        run: terraform fmt -check -diff
+      - name: Validate (no Azure credentials needed)
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+
+  lint-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: terraform-linters/setup-tflint@6ffdbaa3be476b3431f7275c26966ef32ff60337 # v6.3.2
+        with:
+          tflint_version: v0.65.0
+      - name: tflint
+        run: |
+          tflint --init --config "$PWD/.tflint.hcl"
+          tflint --recursive --config "$PWD/.tflint.hcl"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Security scan of the Terraform code
+        run: >-
+          docker run --rm -v "$PWD:/src" -w /src "$TRIVY"
+          config --exit-code 1 --severity HIGH,CRITICAL --ignorefile .trivyignore.yaml .
+      - name: Check the shell scripts
+        run: shellcheck tests/*.sh

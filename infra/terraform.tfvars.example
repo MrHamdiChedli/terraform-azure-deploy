@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars (ignored by Git) and fill in.
+alert_email = "you@example.com"
+
+# Optional overrides
+# environment    = "dev"
+# min_replicas   = 1      # keep one replica warm (no cold start, but costs compute)
+# monthly_budget = 10
