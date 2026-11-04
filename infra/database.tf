@@ -3,6 +3,9 @@ resource "random_password" "db" {
   special = false
 }
 
+# No prevent_destroy: this dev environment is destroyed after each test to save the student credit.
+# A prod environment would set it on the server and the database.
+# tflint-ignore: azurerm_resources_missing_prevent_destroy
 resource "azurerm_postgresql_flexible_server" "main" {
   name                = "psql-${local.name}-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
@@ -35,6 +38,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   }
 }
 
+# tflint-ignore: azurerm_resources_missing_prevent_destroy
 resource "azurerm_postgresql_flexible_server_database" "app" {
   name      = "appdb"
   server_id = azurerm_postgresql_flexible_server.main.id

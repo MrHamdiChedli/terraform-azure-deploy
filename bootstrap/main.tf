@@ -59,12 +59,21 @@ resource "azurerm_storage_account" "state" {
   }
 
   tags = azurerm_resource_group.state.tags
+
+  lifecycle {
+    # Losing the state means Terraform no longer knows what it manages.
+    prevent_destroy = true
+  }
 }
 
 resource "azurerm_storage_container" "state" {
   name                  = "tfstate"
   storage_account_id    = azurerm_storage_account.state.id
   container_access_type = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Lets whoever runs Terraform read and write the state through Entra ID.
