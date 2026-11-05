@@ -26,8 +26,9 @@ flowchart LR
 ## What happened on the real deployment
 
 ```
-$ terraform apply
-Apply complete! Resources: 10 added, 0 changed, 0 destroyed.
+$ terraform apply      # first run: 9 of 10 created, then the error described below
+$ terraform apply      # after the fix
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 app_url = "https://ca-visit-counter-dev.<random>.francecentral.azurecontainerapps.io"
 
 $ bash tests/cloud-smoke-test.sh "$(terraform -chdir=infra output -raw app_url)"
@@ -41,6 +42,7 @@ $ terraform plan -detailed-exitcode
 No changes. Your infrastructure matches the configuration.
 
 $ terraform destroy
+Destroy complete! Resources: 10 destroyed.
 ```
 
 The environment is destroyed after each test to save the student credit, and `terraform apply` brings it back in about 10 minutes.
